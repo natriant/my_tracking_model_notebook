@@ -35,14 +35,16 @@ def my_machine_with_detuners(Qx_init, Qy_init, k3_equivalent, turn, bunch, twiss
     if turn == 1:
         print('flag_detuner {}, flag_noise {}, flag_BB {}, flag_feedback {}'.format(flag_detuner, flag_noise, flag_BB, flag_feedback))
         print('aperture limit is {} [m]'.format(max_aperture_value))
-    
-    if flag_detuner : # In the begining of the ring
-        particles_tunes_x = amplitude_detuning(k3_equivalent, twiss, x = bunch.x, px = bunch.px, y = bunch.y, py=bunch.py) # list with the phase advacne per particle
-        if turn == 1 :
-            print('k3 equivalent', k3_equivalent)
-    
+   
     # Rotation
-    bunch.x, bunch.px, bunch.y, bunch.py = rotation_with_detuners(particles_tunes_x, Qy_rot = Qy_init, twiss = twiss, x = bunch.x, px = bunch.px, y = bunch.y, py=bunch.py)
+    #if turn == 1: # first turn, use the original working point
+    #    bunch.x, bunch.px, bunch.y, bunch.py = rotation(Qx_rot = Qx_init, Qy_rot = Qy_init, twiss = twiss, x = bunch.x, px = bunch.px, y = bunch.y, py=bunch.py)
+    #else:    
+    if flag_detuner:
+        if turn == 1 :
+                print('k3 equivalent', k3_equivalent)
+        particles_tunes_x = amplitude_detuning(k3_equivalent, twiss,x = bunch.x, px = bunch.px, y = bunch.y, py=bunch.py)
+        bunch.x, bunch.px, bunch.y, bunch.py = rotation_with_detuners(particles_tunes_x, Qx_rot = Qx_init, Qy_rot = Qy_init, twiss = twiss, x = bunch.x, px = bunch.px, y = bunch.y, py=bunch.py)
         
     if flag_noise:
         if turn ==1 :
@@ -61,5 +63,6 @@ def my_machine_with_detuners(Qx_init, Qy_init, k3_equivalent, turn, bunch, twiss
     if flag_feedback:
         if turn ==1:
             print('g',gain)
-        bunch.x, bunch.px, bunch.y, bunch.py = feedback_system_map(gain, sigmapx, x= bunch.x, px = bunch.px, y = bunch.y, py=bunch.py)
+        bunch.x, bunch.px, bunch.y, bunch.py = feedback_system_map(gain, sigmapx, x= bunch.x, px = bunch.px, y = bunch.y, py=bunch.py)        
+        
     return bunch

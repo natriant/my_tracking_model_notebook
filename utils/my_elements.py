@@ -16,9 +16,10 @@ def rotation(Qx_rot, Qy_rot, twiss, x, px, y, py):
     py1 = -twiss.gamma_y*sin(Qy_rot)*y+ (cos(Qy_rot)- twiss.alpha_y*sin(Qy_rot))*py
     return x1, px1, y1, py1
 
-def rotation_with_detuners(particles_tunes_x, Qy_rot, twiss, x, px, y, py):
-    x1 = (np.cos(particles_tunes_x) + twiss.alpha_x*np.sin(particles_tunes_x))*x + twiss.beta_x*np.sin(particles_tunes_x)*px
-    px1 = -twiss.gamma_x*np.sin(particles_tunes_x)*x+ (np.cos(particles_tunes_x)-twiss.alpha_x*np.sin(particles_tunes_x))*px
+def rotation_with_detuners(particles_tunes_x, Qx_rot, Qy_rot, twiss, x, px, y, py):
+    Qx_new = Qx_rot+ 2*np.pi*particles_tunes_x
+    x1 = (np.cos(Qx_new) + twiss.alpha_x*np.sin(Qx_new))*x + twiss.beta_x*np.sin(Qx_new)*px
+    px1 = -twiss.gamma_x*np.sin(Qx_new)*x+ (np.cos(Qx_new)-twiss.alpha_x*np.sin(Qx_new))*px
     y1 = (cos(Qy_rot) + twiss.alpha_y*sin(Qy_rot))*y + twiss.beta_y*sin(Qy_rot)*py
     py1 = -twiss.gamma_y*sin(Qy_rot)*y+ (cos(Qy_rot)- twiss.alpha_y*sin(Qy_rot))*py
     return x1, px1, y1, py1
@@ -79,9 +80,9 @@ def amplitude_detuning(k3_equivalent, twiss, x, px, y, py):
     # Detuning with amplitude , see documentation apo pyheadtail
     x1, px1, y1, py1 = x, px, y, py # type: nd.array()
     
-    x1_norm, px1_norm = x1/twiss.beta_x, px1*twiss.beta_x # late on include alpha and gamma to be correct in every case
-    Jx = (x1_norm**2 + px1_norm**2) # actions for each particle 
+    x1_norm, px1_norm = x1/sqrt(twiss.beta_x), px1*sqrt(twiss.beta_x) # late on include alpha and gamma to be correct in every case
+    Jx = (x1_norm**2 + px1_norm**2)/2. # actions for each particle 
     
-    a_xx = (1/8*np.pi)*k3_equivalent*twiss.beta_x # the detuning coefficient
-    particles_tunes_x = 2*a_xx*Jx # DQ(Jx)
+    a_xx = (1/(8*np.pi))*k3_equivalent*(twiss.beta_x**2) # the detuning coefficient
+    particles_tunes_x = a_xx*Jx/2. # DQ(Jx)
     return particles_tunes_x
