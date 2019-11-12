@@ -4,6 +4,7 @@ from dotted_dict import DottedDict
 # This function creates a dictionay where the coordinated of the bunch will be saved every turn. Careful
 # The values of the dictionary are different in every turn.
 # If later you want to analyze the turn by turn data you need to save them during the tracking.
+
 def create_bunch(particles):
     bunch = DottedDict()
     bunch.x = np.zeros(particles)
