@@ -96,3 +96,7 @@ def amplitude_detuning(k3_equivalent_x, k3_equivalent_y, twiss, x, px, y, py):
     particles_tunes_y = a_yy*Jy/2. # DQ(Jy)
     
     return particles_tunes_x, particles_tunes_y
+
+def drift(gamma_rel):
+    eta = abs(1/gamma_rel**2 - alpha_p)
+    zeta = p.zeta + eta * p.delta * self.length
