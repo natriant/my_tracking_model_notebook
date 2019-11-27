@@ -2,6 +2,9 @@ from math import *
 import random
 import numpy as np 
 
+
+### Transverse motion 
+
 def rotation_no_twiss(Qx_rot, Qy_rot, twiss , x, px, y, py):
     x1 = cos(Qx_rot)*x+sin(Qx_rot)*px
     px1 = -sin(Qx_rot)*x+cos(Qx_rot)*px
@@ -23,6 +26,7 @@ def rotation_with_detuners(particles_tunes_x, particles_tunes_y, Qx_rot, Qy_rot,
     px1 = -twiss.gamma_x*np.sin(Qx_new)*x+ (np.cos(Qx_new)-twiss.alpha_x*np.sin(Qx_new))*px
     y1 = (np.cos(Qy_new) + twiss.alpha_y*np.sin(Qy_new))*y + twiss.beta_y*np.sin(Qy_new)*py
     py1 = -twiss.gamma_y*np.sin(Qy_new)*y+ (np.cos(Qy_new)- twiss.alpha_y*np.sin(Qy_new))*py
+    
     return x1, px1, y1, py1
 
 def octupole_map(k3, x, px, y, py):
@@ -77,7 +81,7 @@ def aperture_limits_x_px_y_py(max_aperture_value, x, px, y, py):
             
     return x1, px1, y1, py1
 
-def amplitude_detuning(k3_equivalent_x, k3_equivalent_y, twiss, x, px, y, py):
+def amplitude_detuning(k3_equivalent_x, k3_equivalent_y, twiss, x, px, y, py): # detuner
     # Detuning with amplitude , see documentation apo pyheadtail
     x1, px1, y1, py1 = x, px, y, py # type: nd.array()
     
@@ -95,3 +99,39 @@ def amplitude_detuning(k3_equivalent_x, k3_equivalent_y, twiss, x, px, y, py):
     particles_tunes_y = a_yy*Jy/2. # DQ(Jy)
     
     return particles_tunes_x, particles_tunes_y
+
+
+### Longitudinal motion 
+
+def drift(eta, C0, z, delta):
+    z1 =z - eta * delta * C0
+    delta1 = delta
+    
+    return z1, delta1
+
+def RF_map(P0, m0, beta_0, f_RF, c, lag, V_RF, E_0, z, delta):
+    
+    P = (1 + delta) * P0 #  # Acutally it is P*C --> momentum times the speed of ligth --> [GeV]
+    gamma = np.sqrt(1+(P/m0)**2)
+    beta = np.sqrt(1-1/gamma**2)    
+    old_rvv = beta/beta_0
+    
+    # RF energy kick 
+    k = 2 * np.pi * f_RF  /c
+    tau = z / old_rvv / beta_0
+    phase = lag * np.pi / 180. - k * tau
+   
+    energy = V_RF*np.sin(phase)
+    
+    deltabeta_0 = delta*beta_0
+    ptaubeta_0 = np.sqrt(deltabeta_0**2+2*deltabeta_0*beta_0+1)-1
+    ptaubeta_0 += energy / E_0 # energy kick
+    ptau = ptaubeta_0 / beta_0
+
+    
+    delta1 = np.sqrt(ptau ** 2 + 2 * ptau / beta_0 + 1) - 1
+    rvv = (1 + delta1) / (1 + ptaubeta_0)
+    z1 = z* rvv / old_rvv
+    
+    
+    return z1, delta1
