@@ -43,7 +43,7 @@ def prepere_longitudinal_motion(m0, c, C0, E_0, gamma_tr, sigma_delta_madx, rf):
     h_float  = rf.f_RF/ f_rev_0
     h = int(rf.f_RF/ f_rev_0) 
     
-    # 2. Estimate synchrotron parameters
+    # 2. Estimate synchrotron parameters, auto mallon oxi
     alpha_c = (1/(gamma_tr**2)) # compaction factor
     eta = alpha_c - 1/(gamma_0**2)  # slip factor
     
